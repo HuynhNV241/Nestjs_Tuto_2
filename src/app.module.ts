@@ -15,6 +15,8 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -35,7 +37,29 @@ import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
       }),
       inject: [ConfigService],
     }),
-    AuthModule
+    AuthModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          port: configService.get<number>('MAIL_PORT'),
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: configService.get<string>('MAIL_FROM'),
+        },
+        // template: {
+        //   dir: __dirname + '/templates',
+        //   adapter: new HandlebarsAdapter(),
+        //   options: { strict: true },
+        // },
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [
