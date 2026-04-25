@@ -38,8 +38,11 @@ export class AuthController {
     await this.mailerService.sendMail({
       to: 'huynhnv947@gmail.com',
       subject: 'Test Email',
-      text: 'welcome',
-      html: `<b>Hello World</b>`,
+      template: 'register',
+      context: { 
+        name: 'Huynh Nguyen',
+        activationCode: 123456789
+       },
     });
     return "ok";
   }

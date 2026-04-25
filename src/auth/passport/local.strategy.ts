@@ -15,6 +15,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
+    if (user.isActive === false) {
+      throw new UnauthorizedException('User account is inactive');
+    }
     return user;
   }
 }
